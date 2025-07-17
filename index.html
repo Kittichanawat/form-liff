@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ลงทะเบียนพนักงาน</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <h2>ฟอร์มลงทะเบียนพนักงาน</h2>
+  <form id="form">
+    <input type="hidden" id="userId">
+    <input type="hidden" id="displayName">
+    <label>ชื่อ: <input type="text" id="fname" required></label><br>
+    <label>นามสกุล: <input type="text" id="lname" required></label><br>
+    <label>วันเกิด: <input type="date" id="dob" required></label><br><br>
+    <button type="submit">ส่งข้อมูล</button>
+  </form>
+
+  <script>
+    async function main() {
+      await liff.init({ liffId: "2007772610-2rjPV8NG" }); // เปลี่ยน liffId เป็นของคุณเอง
+
+      // ถ้ายังไม่ login ให้ redirect ไป login แล้วหยุดทำงาน
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return; // รอให้ redirect กลับมา
+      }
+
+      // ถ้า login แล้ว ให้ดึงโปรไฟล์มาแสดง
+      const profile = await liff.getProfile();
+      document.getElementById("userId").value = profile.userId;
+      document.getElementById("displayName").value = profile.displayName;
+    }
+
+    // เมื่อผู้ใช้ submit ฟอร์ม
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = {
+        userId: document.getElementById("userId").value,
+        name: document.getElementById("fname").value,
+        lastname: document.getElementById("lname").value,
+        dob: document.getElementById("dob").value,
+      };
+
+      // เปลี่ยน URL ด้านล่างเป็น webhook ของคุณ (ngrok หรือโดเมนจริง)
+      await fetch("https://dfec9b57af55.ngrok-free.app/webhook/my-form", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      alert("ส่งข้อมูลเรียบร้อยแล้ว!");
+      liff.closeWindow(); // ปิดหน้าต่าง LIFF หลังส่งข้อมูล
+    });
+
+    main();
+  </script>
+</body>
+</html>
