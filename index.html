@@ -11,7 +11,7 @@
     <input type="hidden" id="userId">
     <input type="hidden" id="displayName">
     <label>name: <input type="text" id="fname" required></label><br>
-    <label>lastname: <input type="text" id="lname" required></label><br>
+    <label>lastnamedd: <input type="text" id="lname" required></label><br>
     <label>birthday: <input type="date" id="dob" required></label><br><br>
     <button type="submit">ส่งข้อมูล</button>
   </form>
@@ -43,7 +43,7 @@
       };
 
       // เปลี่ยน URL ด้านล่างเป็น webhook ของคุณ (ngrok หรือโดเมนจริง)
-      await fetch("https://n8n-two.nn-dev.me/webhook/my-form", {
+      await fetch("https://n8n-two.nn-dev.me/webhook-test/my-form", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
