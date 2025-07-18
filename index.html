@@ -65,7 +65,7 @@
   </style>
 </head>
 <body>
-  <h2><i class="fa-solid fa-id-card"></i> ฟอร์มลงทะเบียนพนักงาน</h2>
+  <h2><i class="fa-solid fa-id-card"></i> ฟอร์มลงทะเบียนพนักงาน Codelabs</h2>
   <form id="form">
     <input type="hidden" id="userId">
     <input type="hidden" id="displayName">
@@ -85,11 +85,16 @@
     <label><i class="fa-solid fa-briefcase"></i> ตำแหน่ง:
       <select id="position" required>
         <option value="">-- กรุณาเลือกตำแหน่ง --</option>
-        <option value="แอดมิน">แอดมิน</option>
-        <option value="เจ้าหน้าที่ไอที">เจ้าหน้าที่ไอที</option>
-        <option value="พนักงานขาย">พนักงานขาย</option>
-        <option value="ฝ่ายบัญชี">ฝ่ายบัญชี</option>
-        <option value="ฝ่ายบุคคล">ฝ่ายบุคคล</option>
+        <option value="Project Manager">Project Manager</option>
+        <option value="Quality Assurance">Quality Assurance</option>
+        <option value="UX/UI Designer">UX/UI Designer</option>
+        <option value="Front-end Developer">Front-end Developer</option>
+        <option value="Back-end Developer">Back-end Developer</option>
+        <option value="Business Analyst">Business Analyst</option>
+        <option value="Tester">Tester</option>
+        <option value="AI Engineer">AI Engineer</option>
+        <option value="System Analyst">System Analyst</option>
+        <option value="DevOps">DevOps</option>
       </select>
     </label>
 
@@ -120,7 +125,7 @@
         position: document.getElementById("position").value,
       };
 
-      await fetch("https://n8n-two.nn-dev.me/webhook-test/my-form", {
+      await fetch("https://n8n-three.nn-dev.me/webhook-test/my-from", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
