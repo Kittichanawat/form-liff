@@ -116,24 +116,34 @@
     }
 
     document.getElementById("form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const data = {
-        userId: document.getElementById("userId").value,
-        name: document.getElementById("flname").value,
-        nickname: document.getElementById("nname").value,
-        dob: document.getElementById("dob").value,
-        position: document.getElementById("position").value,
-      };
+  e.preventDefault();
 
-      await fetch("https://n8n-three.nn-dev.me/webhook-test/my-form", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
+  const data = {
+    userId: document.getElementById("userId").value,
+    name: document.getElementById("flname").value,
+    nickname: document.getElementById("nname").value,
+    dob: document.getElementById("dob").value,
+    position: document.getElementById("position").value,
+  };
 
-      alert("ส่งข้อมูลเรียบร้อยแล้ว!");
-      liff.closeWindow();
+  try {
+    const res = await fetch("https://n8n-three.nn-dev.me/webhook-test/my-form", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
     });
+
+    const result = await res.json();  // รับ response ที่ส่งกลับจาก n8n
+
+    alert(result.message); // แสดงข้อความที่ตอบกลับ (เช่น "ส่งข้อมูลเรียบร้อยแล้ว!" หรือ "คุณเคยลงทะเบียนแล้ว")
+    
+    liff.closeWindow(); // ปิดหน้าต่าง LIFF
+  } catch (error) {
+    alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+    console.error(error);
+  }
+});
+
 
     main();
   </script>
