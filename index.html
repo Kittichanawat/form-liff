@@ -119,13 +119,13 @@
       e.preventDefault();
       const data = {
         userId: document.getElementById("userId").value,
-        name: document.getElementById("fname").value,
-        lastname: document.getElementById("lname").value,
+        name: document.getElementById("flname").value,
+        nickname: document.getElementById("nname").value,
         dob: document.getElementById("dob").value,
         position: document.getElementById("position").value,
       };
 
-      await fetch("https://n8n-three.nn-dev.me/webhook-test/my-from", {
+      await fetch("https://n8n-three.nn-dev.me/webhook-test/my-form", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
