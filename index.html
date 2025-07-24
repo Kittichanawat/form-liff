@@ -98,6 +98,10 @@
       </select>
     </label>
 
+    <label > <i class="fa-solid fa-envelope"></i> อีเมล์
+      <input type="email" id="email" required>
+    </label>
+
     <button type="submit"><i class="fa-solid fa-paper-plane"></i> ส่งข้อมูล</button>
   </form>
 
@@ -124,6 +128,7 @@
     nickname: document.getElementById("nname").value,
     dob: document.getElementById("dob").value,
     position: document.getElementById("position").value,
+    email: document.getElementById("email").value
   };
 
   try {
