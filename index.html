@@ -5,6 +5,7 @@
   <title>ลงทะเบียนพนักงาน</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -105,52 +106,82 @@
     <button type="submit"><i class="fa-solid fa-paper-plane"></i> ส่งข้อมูล</button>
   </form>
 
+
   <script>
-    async function main() {
-      await liff.init({ liffId: "2007772610-2rjPV8NG" });
-
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
-
-      const profile = await liff.getProfile();
-      document.getElementById("userId").value = profile.userId;
-      document.getElementById("displayName").value = profile.displayName;
-    }
-
-    document.getElementById("form").addEventListener("submit", async (e) => {
+document.getElementById("form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const data = {
-    userId: document.getElementById("userId").value,
-    name: document.getElementById("flname").value,
-    nickname: document.getElementById("nname").value,
-    dob: document.getElementById("dob").value,
-    position: document.getElementById("position").value,
-    email: document.getElementById("email").value
-  };
+  const phone = document.getElementById("phone").value;
 
   try {
+    // 👉 ส่ง OTP ไปยังเบอร์โทร
+    const otpRes = await fetch("https://n8n-three.nn-dev.me/webhook-test/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone })
+    });
+
+    const otpResult = await otpRes.json();
+
+    if (!otpResult.success) {
+      Swal.fire("ส่ง OTP ไม่สำเร็จ", otpResult.message || "ลองใหม่อีกครั้ง", "error");
+      return;
+    }
+
+    // ✅ ถ้าส่ง OTP สำเร็จ ให้ขึ้นหน้าให้กรอก OTP
+    const { value: userOtp } = await Swal.fire({
+      title: "กรุณาใส่รหัส OTP",
+      input: "text",
+      inputLabel: `รหัสถูกส่งไปที่ ${phone}`,
+      inputPlaceholder: "กรอกรหัส 6 หลักที่ได้รับ",
+      inputValidator: (value) => {
+        if (!value) return "กรุณาใส่รหัส OTP";
+      },
+      showCancelButton: true
+    });
+
+    if (!userOtp) return;
+
+    // 🧪 ตรวจสอบ OTP
+    const verifyRes = await fetch("https://n8n-three.nn-dev.me/webhook/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, otp: userOtp })
+    });
+
+    const verifyResult = await verifyRes.json();
+
+    if (!verifyResult.verified) {
+      Swal.fire("OTP ไม่ถูกต้อง", "กรุณาลองใหม่", "error");
+      return;
+    }
+
+    // ✅ ถ้า OTP ผ่าน ค่อยส่งข้อมูลจริง
+    const data = {
+      userId: document.getElementById("userId").value,
+      name: document.getElementById("flname").value,
+      nickname: document.getElementById("nname").value,
+      dob: document.getElementById("dob").value,
+      position: document.getElementById("position").value,
+      email: document.getElementById("email").value,
+      phone: phone
+    };
+
     const res = await fetch("https://n8n-three.nn-dev.me/webhook/my-form", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
-    const result = await res.json();  // รับ response ที่ส่งกลับจาก n8n
+    const result = await res.json();
+    Swal.fire("ลงทะเบียนสำเร็จ", result.message || "เรียบร้อยแล้ว", "success").then(() => liff.closeWindow());
 
-    alert(result.message); // แสดงข้อความที่ตอบกลับ (เช่น "ส่งข้อมูลเรียบร้อยแล้ว!" หรือ "คุณเคยลงทะเบียนแล้ว")
-    
-    liff.closeWindow(); // ปิดหน้าต่าง LIFF
-  } catch (error) {
-    alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
-    console.error(error);
+  } catch (err) {
+    console.error(err);
+    Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถส่งข้อมูลได้", "error");
   }
 });
 
-
-    main();
   </script>
 </body>
 </html>
