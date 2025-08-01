@@ -241,7 +241,7 @@
            // ✅ OTP ผ่านแล้ว ให้ส่งข้อมูลจริงไปเก็บใน DB
            if (lastSentData) {
       // อย่าเขียนทับ object ต้นฉบับ ถ้าต้องการเก็บไว้ใช้ซ้ำ ให้ clone
-      const payload = { ...lastSentData, verified_at: true };
+      const payload = { ...lastSentData, verified: true };
 
 
       try {
