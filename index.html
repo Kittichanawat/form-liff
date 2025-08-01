@@ -263,7 +263,7 @@
             // ปิด modal ก่อนแจ้งผล
             otpModalInstance.hide();
 
-            if (insertResult.message === "มีข้อมูลอยู่ในระบบแล้ว") {
+            if (insertResult.message === "duplicate") {
               Swal.fire({
                 icon: "info",
                 title: "เคยลงทะเบียนแล้ว",
@@ -273,17 +273,17 @@
                   liff.closeWindow();
                 }
               });
-            } else if (!insertResult.success) {
+            } else if (insertResult.message=== "success") {
               Swal.fire({
-                icon: "warning",
-                title: "ลงทะเบียนไม่สมบูรณ์",
-                text: insertResult.message || "เกิดปัญหาในการบันทึกข้อมูล"
+                icon: "success",
+                title: "ลงทะเบียนสำเร็จ",
+                text: "ข้อมูลถูกบันทึกแล้ว"
               });
             } else {
               Swal.fire({
                 icon: "success",
-                title: "ลงทะเบียนสำเร็จ",
-                text: "OTP ผ่านแล้ว และข้อมูลถูกบันทึกแล้ว"
+                title: "เกิดข้อผิดพลาด",
+                text: "เกิดข้อผิดพลาดในการบันทึกข้อมูล"
               }).then(() => {
                 if (window.liff && liff.closeWindow) {
                   liff.closeWindow();
