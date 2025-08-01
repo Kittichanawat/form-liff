@@ -240,26 +240,31 @@
         }
            // ✅ OTP ผ่านแล้ว ให้ส่งข้อมูลจริงไปเก็บใน DB
            if (lastSentData) {
-      // อย่าเขียนทับ object ต้นฉบับ ถ้าต้องการเก็บไว้ใช้ซ้ำ ให้ clone
-      const payload = { ...lastSentData, verified: true };
+  const payload = { ...lastSentData, verified: true };
 
+  try {
+    const insertRes = await fetch("https://n8n-three.nn-dev.me/webhook/my-form", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const insertResult = await insertRes.json();
 
-      try {
-        const insertRes = await fetch("https://n8n-three.nn-dev.me/webhook/my-form", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        const insertResult = await insertRes.json();
-
-        if (!insertResult.success) {
-          Swal.fire("ลงทะเบียนไม่สมบูรณ์", insertResult.message || "เกิดปัญหาในการบันทึกข้อมูล", "warning");
-        }
-      } catch (err) {
-        console.error("Insert error:", err);
-        Swal.fire("ลงทะเบียนไม่สมบูรณ์", "เกิดข้อผิดพลาดตอนบันทึกข้อมูล", "warning");
-      }
+    if (insertResult.message === "มีข้อมูลอยู่ในระบบแล้ว") {
+      // กรณีซ้ำ แจ้งผู้ใช้แบบเบา ๆ แต่ถือว่าผ่าน
+      Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: insertResult.message
+      })
+    } else if (!insertResult.success) {
+      Swal.fire("ลงทะเบียนไม่สมบูรณ์", insertResult.message || "เกิดปัญหาในการบันทึกข้อมูล", "warning");
     }
+  } catch (err) {
+    console.error("Insert error:", err);
+    Swal.fire("ลงทะเบียนไม่สมบูรณ์", "เกิดข้อผิดพลาดตอนบันทึกข้อมูล", "warning");
+  }
+}
 
 
         // สำเร็จ
