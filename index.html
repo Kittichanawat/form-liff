@@ -214,72 +214,89 @@
     });
 
     async function verifyOtp() {
-      const phone = document.getElementById("phone").value.trim();
-      const userOtp = document.getElementById("inputOtp").value.trim();
-      const errorEl = document.getElementById("otp-error");
+  const phone = document.getElementById("phone").value.trim();
+  const userOtp = document.getElementById("inputOtp").value.trim();
+  const errorEl = document.getElementById("otp-error");
 
-      if (!/^\d{6}$/.test(userOtp)) {
-        errorEl.textContent = "กรุณากรอกรหัส 6 หลัก";
-        errorEl.classList.remove("d-none");
-        return;
-      }
-
-      try {
-        const verifyRes = await fetch("https://n8n-three.nn-dev.me/webhook/verify-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, otp: userOtp })
-        });
-
-        const verifyResult = await verifyRes.json();
-
-        if (!verifyResult.verified) {
-          errorEl.textContent = "OTP ไม่ถูกต้องหรือหมดอายุ";
-          errorEl.classList.remove("d-none");
-          return;
-        }
-           // ✅ OTP ผ่านแล้ว ให้ส่งข้อมูลจริงไปเก็บใน DB
-           if (lastSentData) {
-  const payload = { ...lastSentData, verified: true };
+  if (!/^\d{6}$/.test(userOtp)) {
+    errorEl.textContent = "กรุณากรอกรหัส 6 หลัก";
+    errorEl.classList.remove("d-none");
+    return;
+  }
 
   try {
-    const insertRes = await fetch("https://n8n-three.nn-dev.me/webhook/my-form", {
+    const verifyRes = await fetch("https://n8n-three.nn-dev.me/webhook/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ phone, otp: userOtp })
     });
-    const insertResult = await insertRes.json();
 
-    if (insertResult.message === "มีข้อมูลอยู่ในระบบแล้ว") {
-      // กรณีซ้ำ แจ้งผู้ใช้แบบเบา ๆ แต่ถือว่าผ่าน
-      Swal.fire({
-        icon: 'error',
-        title: 'เกิดข้อผิดพลาด',
-        text: insertResult.message
-      })
-    } else if (!insertResult.success) {
-      Swal.fire("ลงทะเบียนไม่สมบูรณ์", insertResult.message || "เกิดปัญหาในการบันทึกข้อมูล", "warning");
+    const verifyResult = await verifyRes.json();
+
+    if (!verifyResult.verified) {
+      errorEl.textContent = "OTP ไม่ถูกต้องหรือหมดอายุ";
+      errorEl.classList.remove("d-none");
+      return;
     }
-  } catch (err) {
-    console.error("Insert error:", err);
-    Swal.fire("ลงทะเบียนไม่สมบูรณ์", "เกิดข้อผิดพลาดตอนบันทึกข้อมูล", "warning");
-  }
-}
 
-
-        // สำเร็จ
-        otpModalInstance.hide();
-        Swal.fire("ลงทะเบียนสำเร็จ", "OTP ผ่านแล้ว", "success").then(() => {
-          if (window.liff && liff.closeWindow) {
-            liff.closeWindow();
-          }
+    // OTP ผ่านแล้ว — ไปทำการ insert แล้วแจ้งผลตามกรณี
+    if (lastSentData) {
+      const payload = { ...lastSentData, verified: true };
+      try {
+        const insertRes = await fetch("https://n8n-three.nn-dev.me/webhook/my-form", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
+        const insertResult = await insertRes.json();
 
+        // ปิด modal ก่อนแจ้งผล
+        otpModalInstance.hide();
+
+        if (insertResult.message === "มีข้อมูลอยู่ในระบบแล้ว") {
+          Swal.fire({
+            icon: "info",
+            title: "เคยลงทะเบียนแล้ว",
+            text: "มีข้อมูลอยู่ในระบบแล้ว ไม่ต้องลงซ้ำ"
+          }).then(() => {
+            if (window.liff && liff.closeWindow) {
+              liff.closeWindow();
+            }
+          });
+        } else if (!insertResult.success) {
+          Swal.fire({
+            icon: "warning",
+            title: "ลงทะเบียนไม่สมบูรณ์",
+            text: insertResult.message || "เกิดปัญหาในการบันทึกข้อมูล"
+          });
+        } else {
+          Swal.fire({
+            icon: "success",
+            title: "ลงทะเบียนสำเร็จ",
+            text: "OTP ผ่านแล้ว และข้อมูลถูกบันทึกแล้ว"
+          }).then(() => {
+            if (window.liff && liff.closeWindow) {
+              liff.closeWindow();
+            }
+          });
+        }
       } catch (err) {
-        console.error(err);
-        errorEl.textContent = "เกิดข้อผิดพลาดระหว่างตรวจสอบ OTP";
-        errorEl.classList.remove("d-none");
+        console.error("Insert error:", err);
+        otpModalInstance.hide();
+        Swal.fire({
+          icon: "warning",
+          title: "ลงทะเบียนไม่สมบูรณ์",
+          text: "เกิดข้อผิดพลาดตอนบันทึกข้อมูล"
+        });
       }
+    } else {
+      // กรณีไม่มี lastSentData (ไม่ควรเกิด) แจ้งว่าข้อมูลหาย
+      otpModalInstance.hide();
+      Swal.fire({
+        icon: "error",
+        title: "ไม่พบข้อมูล",
+        text: "ข้อมูลการลงทะเบียนหายไป กรุณากรอกใหม่"
+      });
     }
 
     async function resendOtp() {
