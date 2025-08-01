@@ -100,199 +100,193 @@
       </select>
     </label>
 
-    <label > <i class="fa-solid fa-envelope"></i> อีเมล์
+    <label><i class="fa-solid fa-envelope"></i> อีเมล์
       <input type="email" id="email" required>
     </label>
 
-    <label > <i class="fa-solid fa-phone"></i> เบอร์โทรศัพท์
+    <label><i class="fa-solid fa-phone"></i> เบอร์โทรศัพท์
       <input type="tel" id="phone" pattern="[0-9]{10}" required>
     </label>
 
-    <button type="submit" ><i class="fa-solid fa-paper-plane"></i> ส่งข้อมูล</button>
+    <button type="submit"><i class="fa-solid fa-paper-plane"></i> ส่งข้อมูล</button>
   </form>
 
-
-
-
   <!-- OTP Modal -->
-<div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content rounded-3 shadow">
-      <div class="modal-header">
-        <h5 class="modal-title" id="otpModalLabel"><i class="fa-solid fa-key"></i> ยืนยัน OTP</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
-      </div>
-      <div class="modal-body">
-        <p id="otpSentInfo">รหัสถูกส่งไปที่ <span id="otpPhoneDisplay"></span></p>
-        <div class="mb-3">
-          <label for="inputOtp" class="form-label">กรอกรหัส OTP 6 หลัก</label>
-          <input type="text" class="form-control" id="inputOtp" maxlength="6" placeholder="xxxxxx" pattern="\d{6}">
-          <div class="invalid-feedback">
-            กรุณากรอกรหัส OTP 6 ตัว
+  <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content rounded-3 shadow">
+        <div class="modal-header">
+          <h5 class="modal-title" id="otpModalLabel"><i class="fa-solid fa-key"></i> ยืนยัน OTP</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+        </div>
+        <div class="modal-body">
+          <p id="otpSentInfo">รหัสถูกส่งไปที่ <span id="otpPhoneDisplay"></span></p>
+          <div class="mb-3">
+            <label for="inputOtp" class="form-label">กรอกรหัส OTP 6 หลัก</label>
+            <input type="text" class="form-control" id="inputOtp" maxlength="6" placeholder="xxxxxx" pattern="\d{6}">
+            <div class="invalid-feedback">
+              กรุณากรอกรหัส OTP 6 ตัว
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <small id="resendHint" class="text-muted">ไม่ได้รับรหัส? <button type="button" class="btn btn-link p-0" id="resendOtpBtn">ส่งใหม่</button></small>
+            <span id="countdown" class="small text-secondary"></span>
           </div>
         </div>
-        <div class="d-flex justify-content-between align-items-center">
-          <small id="resendHint" class="text-muted">ไม่ได้รับรหัส? <button type="button" class="btn btn-link p-0" id="resendOtpBtn">ส่งใหม่</button></small>
-          <span id="countdown" class="small text-secondary"></span>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="button" class="btn btn-primary" id="confirmOtpBtn"><i class="fa-solid fa-check"></i> ยืนยัน</button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-        <button type="button" class="btn btn-primary" id="confirmOtpBtn"><i class="fa-solid fa-check"></i> ยืนยัน</button>
       </div>
     </div>
   </div>
-</div>
 
+  <script>
+    const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+    let resendTimer = null;
+    let canResend = true;
+    const RESEND_COOLDOWN = 30; // วินาที
 
+    function startResendCountdown() {
+      let remaining = RESEND_COOLDOWN;
+      canResend = false;
+      document.getElementById('resendOtpBtn').disabled = true;
+      document.getElementById('countdown').textContent = `ส่งใหม่ได้ใน ${remaining}s`;
 
-<script>
-  const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
-  let resendTimer = null;
-  let canResend = true;
-  const RESEND_COOLDOWN = 30; // วินาที
+      resendTimer = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          clearInterval(resendTimer);
+          canResend = true;
+          document.getElementById('resendOtpBtn').disabled = false;
+          document.getElementById('countdown').textContent = '';
+        } else {
+          document.getElementById('countdown').textContent = `ส่งใหม่ได้ใน ${remaining}s`;
+        }
+      }, 1000);
+    }
 
-  function startResendCountdown() {
-    let remaining = RESEND_COOLDOWN;
-    canResend = false;
-    document.getElementById('resendOtpBtn').disabled = true;
-    document.getElementById('countdown').textContent = `ส่งใหม่ได้ใน ${remaining}s`;
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    resendTimer = setInterval(() => {
-      remaining -= 1;
-      if (remaining <= 0) {
-        clearInterval(resendTimer);
-        canResend = true;
-        document.getElementById('resendOtpBtn').disabled = false;
-        document.getElementById('countdown').textContent = '';
-      } else {
-        document.getElementById('countdown').textContent = `ส่งใหม่ได้ใน ${remaining}s`;
-      }
-    }, 1000);
-  }
-
-  document.getElementById("form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const phone = document.getElementById("phone").value;
-    const data = {
-      userId: document.getElementById("userId").value,
-      name: document.getElementById("flname").value,
-      nickname: document.getElementById("nname").value,
-      dob: document.getElementById("dob").value,
-      position: document.getElementById("position").value,
-      email: document.getElementById("email").value,
-      phone: phone
-    };
-
-    try {
-      // ส่งข้อมูลเพื่อสร้าง OTP
-      const res = await fetch("https://n8n-three.nn-dev.me/webhook/send-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      const result = await res.json();
-
-      if (!result.success) {
-        Swal.fire("ไม่สามารถส่ง OTP ได้", result.message || "กรุณาลองใหม่อีกครั้ง", "error");
-        return;
-      }
-
-      // แสดง modal ให้กรอก OTP
-      document.getElementById('otpPhoneDisplay').textContent = phone;
-      document.getElementById('inputOtp').value = '';
-      document.getElementById('inputOtp').classList.remove('is-invalid');
-      otpModal.show();
-      startResendCountdown();
-
-      // รอการกดยืนยันจาก modal
-      const verifyFlow = async () => {
-        return new Promise((resolve, reject) => {
-          const confirmBtn = document.getElementById("confirmOtpBtn");
-          const onConfirm = async () => {
-            const userOtp = document.getElementById("inputOtp").value.trim();
-            if (!/^\d{6}$/.test(userOtp)) {
-              document.getElementById("inputOtp").classList.add("is-invalid");
-              return;
-            }
-            document.getElementById("inputOtp").classList.remove("is-invalid");
-
-            try {
-              const verifyRes = await fetch("https://n8n-three.nn-dev.me/webhook/verify-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone, otp: userOtp })
-              });
-              const verifyResult = await verifyRes.json();
-
-              if (!verifyResult.verified) {
-                // แสดง error แบบชัดเจน
-                Swal.fire("OTP ไม่ถูกต้อง", "กรุณาลองใหม่", "error");
-                resolve(false);
-              } else {
-                resolve(true);
-              }
-            } catch (err) {
-              console.error(err);
-              Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถตรวจสอบ OTP ได้", "error");
-              resolve(false);
-            } finally {
-              confirmBtn.removeEventListener("click", onConfirm);
-            }
-          };
-
-          confirmBtn.addEventListener("click", onConfirm);
-
-          // ถ้าปิด modal ให้ยกเลิก
-          document.getElementById('otpModal').addEventListener('hidden.bs.modal', () => {
-            resolve(null);
-          }, { once: true });
-        });
+      const phone = document.getElementById("phone").value;
+      const data = {
+        userId: document.getElementById("userId").value,
+        name: document.getElementById("flname").value,
+        nickname: document.getElementById("nname").value,
+        dob: document.getElementById("dob").value,
+        position: document.getElementById("position").value,
+        email: document.getElementById("email").value,
+        phone: phone
       };
 
-      const verified = await verifyFlow();
+      try {
+        // ส่งข้อมูลเพื่อสร้าง OTP
+        const res = await fetch("https://n8n-three.nn-dev.me/webhook/send-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
 
-      if (verified) {
-        otpModal.hide();
-        Swal.fire("ลงทะเบียนสำเร็จ", "OTP ผ่านแล้ว", "success").then(() => liff.closeWindow());
-      } else if (verified === false) {
-        // ยังอยู่ใน modal; ให้ผู้ใช้แก้ไขหรือส่งใหม่
-      } else {
-        // ยกเลิก (null) ไม่มี action เพิ่ม
-      }
+        const result = await res.json();
 
-    } catch (err) {
-      console.error(err);
-      Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถดำเนินการได้", "error");
-    }
-  });
+        if (!result.success) {
+          Swal.fire("ไม่สามารถส่ง OTP ได้", result.message || "กรุณาลองใหม่อีกครั้ง", "error");
+          return;
+        }
 
-  // ปุ่มขอรหัสใหม่
-  document.getElementById("resendOtpBtn").addEventListener("click", async () => {
-    if (!canResend) return;
-    const phone = document.getElementById("phone").value;
-    try {
-      // แค่เรียก endpoint เดิมอีกครั้ง (ต้องให้ webhook รองรับ resend)
-      const res = await fetch("https://n8n-three.nn-dev.me/webhook/send-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }) // ถ้าต้องการข้อมูลเดิมเพิ่มฟิลด์อื่นตาม API
-      });
-      const result = await res.json();
-      if (result.success) {
-        Swal.fire({ title: "ส่งใหม่แล้ว", icon: "success", timer: 1200, showConfirmButton: false });
+        // แสดง modal ให้กรอก OTP
+        document.getElementById('otpPhoneDisplay').textContent = phone;
+        document.getElementById('inputOtp').value = '';
+        document.getElementById('inputOtp').classList.remove('is-invalid');
+        otpModal.show();
         startResendCountdown();
-      } else {
-        Swal.fire("ไม่สามารถส่ง OTP ใหม่ได้", result.message || "ลองอีกครั้ง", "error");
+
+        // รอการกดยืนยันจาก modal
+        const verifyFlow = async () => {
+          return new Promise((resolve) => {
+            const confirmBtn = document.getElementById("confirmOtpBtn");
+            const onConfirm = async () => {
+              const userOtp = document.getElementById("inputOtp").value.trim();
+              if (!/^\d{6}$/.test(userOtp)) {
+                document.getElementById("inputOtp").classList.add("is-invalid");
+                return;
+              }
+              document.getElementById("inputOtp").classList.remove("is-invalid");
+
+              try {
+                const verifyRes = await fetch("https://n8n-three.nn-dev.me/webhook/verify-otp", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ phone, otp: userOtp })
+                });
+                const verifyResult = await verifyRes.json();
+
+                if (!verifyResult.verified) {
+                  Swal.fire("OTP ไม่ถูกต้อง", "กรุณาลองใหม่", "error");
+                  resolve(false);
+                } else {
+                  resolve(true);
+                }
+              } catch (err) {
+                console.error(err);
+                Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถตรวจสอบ OTP ได้", "error");
+                resolve(false);
+              } finally {
+                confirmBtn.removeEventListener("click", onConfirm);
+              }
+            };
+
+            confirmBtn.addEventListener("click", onConfirm);
+
+            // ถ้าปิด modal ให้ยกเลิก
+            document.getElementById('otpModal').addEventListener('hidden.bs.modal', () => {
+              resolve(null);
+            }, { once: true });
+          });
+        };
+
+        const verified = await verifyFlow();
+
+        if (verified) {
+          otpModal.hide();
+          Swal.fire("ลงทะเบียนสำเร็จ", "OTP ผ่านแล้ว", "success").then(() => liff.closeWindow());
+        } else if (verified === false) {
+          // ยังอยู่ใน modal; ให้ผู้ใช้แก้ไขหรือส่งใหม่
+        } else {
+          // ยกเลิก (null) ไม่มี action เพิ่ม
+        }
+
+      } catch (err) {
+        console.error(err);
+        Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถดำเนินการได้", "error");
       }
-    } catch (e) {
-      console.error(e);
-      Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถส่งรหัสใหม่ได้", "error");
-    }
-  });
-</script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+    });
+
+    // ปุ่มขอรหัสใหม่
+    document.getElementById("resendOtpBtn").addEventListener("click", async () => {
+      if (!canResend) return;
+      const phone = document.getElementById("phone").value;
+      try {
+        const res = await fetch("https://n8n-three.nn-dev.me/webhook/send-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone })
+        });
+        const result = await res.json();
+        if (result.success) {
+          Swal.fire({ title: "ส่งใหม่แล้ว", icon: "success", timer: 1200, showConfirmButton: false });
+          startResendCountdown();
+        } else {
+          Swal.fire("ไม่สามารถส่ง OTP ใหม่ได้", result.message || "ลองอีกครั้ง", "error");
+        }
+      } catch (e) {
+        console.error(e);
+        Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถส่งรหัสใหม่ได้", "error");
+      }
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 </body>
 </html>
