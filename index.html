@@ -225,7 +225,25 @@
           errorEl.classList.remove("d-none");
           return;
         }
+           // ✅ OTP ผ่านแล้ว ให้ส่งข้อมูลจริงไปเก็บใน DB
+    if (lastSentData) {
+      try {
+        const insertRes = await fetch("https://n8n-three.nn-dev.me/webhook/my-form", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(lastSentData)
+        });
+        const insertResult = await insertRes.json();
 
+        if (!insertResult.success) {
+          // ถ้า insert ผิดพลาด แจ้งผู้ใช้ แต่ยังถือว่า OTP ผ่าน
+          Swal.fire("ลงทะเบียนไม่สมบูรณ์", insertResult.message || "เกิดปัญหาในการบันทึกข้อมูล", "warning");
+        }
+      } catch (err) {
+        console.error("Insert error:", err);
+        Swal.fire("ลงทะเบียนไม่สมบูรณ์", "เกิดข้อผิดพลาดตอนบันทึกข้อมูล", "warning");
+      }
+    }
         // สำเร็จ
         otpModalInstance.hide();
         Swal.fire("ลงทะเบียนสำเร็จ", "OTP ผ่านแล้ว", "success").then(() => {
