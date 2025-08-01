@@ -239,17 +239,19 @@
           return;
         }
            // ✅ OTP ผ่านแล้ว ให้ส่งข้อมูลจริงไปเก็บใน DB
-    if (lastSentData) {
+           if (lastSentData) {
+      // อย่าเขียนทับ object ต้นฉบับ ถ้าต้องการเก็บไว้ใช้ซ้ำ ให้ clone
+      const payload = { ...lastSentData, verified_at: new Date().toISOString() };
+
       try {
         const insertRes = await fetch("https://n8n-three.nn-dev.me/webhook/my-form", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(lastSentData)
+          body: JSON.stringify(payload)
         });
         const insertResult = await insertRes.json();
 
         if (!insertResult.success) {
-          // ถ้า insert ผิดพลาด แจ้งผู้ใช้ แต่ยังถือว่า OTP ผ่าน
           Swal.fire("ลงทะเบียนไม่สมบูรณ์", insertResult.message || "เกิดปัญหาในการบันทึกข้อมูล", "warning");
         }
       } catch (err) {
@@ -257,6 +259,8 @@
         Swal.fire("ลงทะเบียนไม่สมบูรณ์", "เกิดข้อผิดพลาดตอนบันทึกข้อมูล", "warning");
       }
     }
+
+
         // สำเร็จ
         otpModalInstance.hide();
         Swal.fire("ลงทะเบียนสำเร็จ", "OTP ผ่านแล้ว", "success").then(() => {
