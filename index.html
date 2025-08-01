@@ -278,16 +278,16 @@
                 icon: "success",
                 title: "ลงทะเบียนสำเร็จ",
                 text: "ข้อมูลถูกบันทึกแล้ว"
-              });
-            } else {
-              Swal.fire({
-                icon: "success",
-                title: "เกิดข้อผิดพลาด",
-                text: "เกิดข้อผิดพลาดในการบันทึกข้อมูล"
               }).then(() => {
                 if (window.liff && liff.closeWindow) {
                   liff.closeWindow();
                 }
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: "เกิดข้อผิดพลาดในการบันทึกข้อมูล"
               });
             }
           } catch (err) {
