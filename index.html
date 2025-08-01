@@ -139,6 +139,19 @@
   <script>
     let lastSentData = null;
     let otpModalInstance = null;
+    async function main() {
+      await liff.init({ liffId: "2007772610-2rjPV8NG" });
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+
+      const profile = await liff.getProfile();
+      document.getElementById("userId").value = profile.userId;
+      document.getElementById("displayName").value = profile.displayName;
+    }
+
 
     // Initialize Bootstrap modal after DOM
     document.addEventListener("DOMContentLoaded", () => {
