@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -137,6 +138,11 @@
   </div>
 
   <script>
+
+const SUPABASE_URL = "https://wdjntnboatkzuwyoikkr.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7LcvdE3Q2NlnmJM_wb3qHA_ucbjPkKV"; 
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let lastSentData = null;
     let otpModalInstance = null;
 
