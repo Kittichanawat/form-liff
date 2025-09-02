@@ -385,7 +385,7 @@ main().then(loadDepartments);
       try {
         submitBtn.disabled = true; spinner.classList.remove('d-none');
 
-        const res = await fetch("https://n8n-three.nn-dev.me/webhook-test/send-otp", {
+        const res = await fetch("https://n8n-three.nn-dev.me/webhook/send-otp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
@@ -425,7 +425,7 @@ main().then(loadDepartments);
       }
 
       try {
-        const verifyRes = await fetch("https://n8n-three.nn-dev.me/webhook-test/verify-otp", {
+        const verifyRes = await fetch("https://n8n-three.nn-dev.me/webhook/verify-otp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ phone, otp: userOtp })
@@ -443,7 +443,7 @@ main().then(loadDepartments);
         if (lastSentData) {
           const payload = { ...lastSentData, verified: true };
           try {
-            const insertRes = await fetch("https://n8n-three.nn-dev.me/webhook-test/my-form", {
+            const insertRes = await fetch("https://n8n-three.nn-dev.me/webhook/my-form", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload)
