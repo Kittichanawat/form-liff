@@ -315,6 +315,9 @@ document.getElementById("department").addEventListener("change", (e) => {
   }
 });
 
+// เรียกใช้ loadDepartments() ตอน init
+main().then(loadDepartments);
+
     // ===== State =====
     let lastSentData = null;
     let otpModalInstance = null;
