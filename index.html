@@ -386,10 +386,14 @@ main().then(loadDepartments);
         submitBtn.disabled = true; spinner.classList.remove('d-none');
 
         const res = await fetch("https://n8n-three.nn-dev.me/webhook/send-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    ...data,         // ข้อมูลเดิม เช่น phone, userId, name ฯลฯ
+    action: "send"   // เพิ่ม action
+  })
+});
+
 
         const result = await res.json();
 
