@@ -429,11 +429,15 @@ main().then(loadDepartments);
       }
 
       try {
-        const verifyRes = await fetch("https://n8n-three.nn-dev.me/webhook/verify-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, otp: userOtp })
-        });
+        const verifyRes = await fetch("https://n8n-three.nn-dev.me/webhook/send-otp", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    phone,
+    otp: userOtp,
+    action: "verify"
+  })
+});
 
         const verifyResult = await verifyRes.json();
 
