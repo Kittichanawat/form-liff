@@ -167,25 +167,28 @@
             </div>
           </div>
 
-          <div class="col-12 col-md-6">
-            <label for="position" class="form-label form-section-title">ตำแหน่ง</label>
-            <div class="field">
-              <i class="fa-solid fa-briefcase input-icon"></i>
-              <select id="position" class="form-select" required>
-                <option value="">-- กรุณาเลือกตำแหน่ง --</option>
-                <option value="Project Manager">Project Manager</option>
-                <option value="Quality Assurance">Quality Assurance</option>
-                <option value="UX/UI Designer">UX/UI Designer</option>
-                <option value="Front-end Developer">Front-end Developer</option>
-                <option value="Back-end Developer">Back-end Developer</option>
-                <option value="Business Analyst">Business Analyst</option>
-                <option value="Tester">Tester</option>
-                <option value="AI Engineer">AI Engineer</option>
-                <option value="System Analyst">System Analyst</option>
-                <option value="DevOps">DevOps</option>
-              </select>
-            </div>
-          </div>
+          <!-- ช่องเลือกแผนก -->
+<div class="col-12 col-md-6">
+  <label for="department" class="form-label form-section-title">แผนก</label>
+  <div class="field">
+    <i class="fa-solid fa-building input-icon"></i>
+    <select id="department" class="form-select" required>
+      <option value="">-- กรุณาเลือกแผนก --</option>
+    </select>
+  </div>
+</div>
+
+<!-- ช่องเลือกตำแหน่ง (ซ่อนตอนแรก) -->
+<div class="col-12 col-md-6" id="position-wrapper" style="display:none;">
+  <label for="position" class="form-label form-section-title">ตำแหน่ง</label>
+  <div class="field">
+    <i class="fa-solid fa-briefcase input-icon"></i>
+    <select id="position" class="form-select" required>
+      <option value="">-- กรุณาเลือกตำแหน่ง --</option>
+    </select>
+  </div>
+</div>
+
 
           <div class="col-12 col-md-6">
             <label for="email" class="form-label form-section-title">อีเมล</label>
@@ -247,10 +250,70 @@
   </div>
 
   <script>
-    // ===== Supabase (optional, keep for future use) =====
-    const SUPABASE_URL = "https://wdjntnboatkzuwyoikkr.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_7LcvdE3Q2NlnmJM_wb3qHA_ucbjPkKV";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+   // ===== Supabase Config =====
+const SUPABASE_URL = "https://wdjntnboatkzuwyoikkr.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7LcvdE3Q2NlnmJM_wb3qHA_ucbjPkKV";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let depMap = {}; // { dep_id: { name, positions: [] } }
+
+// โหลดข้อมูลแผนก + ตำแหน่ง
+async function loadDepartments() {
+  const { data, error } = await supabase
+    .from("dep_pos")
+    .select(`
+      dep_id,
+      p_id,
+      departments (dep_id, dep_name),
+      position (p_id, p_name)
+    `);
+
+  if (error) {
+    console.error("Load departments error:", error);
+    return;
+  }
+
+  depMap = {};
+  data.forEach(item => {
+    const dep = item.departments;
+    const pos = item.position;
+
+    if (!depMap[dep.dep_id]) {
+      depMap[dep.dep_id] = { name: dep.dep_name, positions: [] };
+    }
+    depMap[dep.dep_id].positions.push({ id: pos.p_id, name: pos.p_name });
+  });
+
+  // เติม dropdown แผนก
+  const depSelect = document.getElementById("department");
+  depSelect.innerHTML = '<option value="">-- กรุณาเลือกแผนก --</option>';
+  Object.entries(depMap).forEach(([depId, dep]) => {
+    const opt = document.createElement("option");
+    opt.value = depId;
+    opt.textContent = dep.name;
+    depSelect.appendChild(opt);
+  });
+}
+
+// เมื่อเลือกแผนก → เติม dropdown ตำแหน่ง
+document.getElementById("department").addEventListener("change", (e) => {
+  const depId = e.target.value;
+  const posSelect = document.getElementById("position");
+
+  posSelect.innerHTML = '<option value="">-- กรุณาเลือกตำแหน่ง --</option>';
+
+  if (depId && depMap[depId]) {
+    depMap[depId].positions.forEach(pos => {
+      const opt = document.createElement("option");
+      opt.value = pos.id;
+      opt.textContent = pos.name;
+      posSelect.appendChild(opt);
+    });
+    document.getElementById("position-wrapper").style.display = "block";
+  } else {
+    document.getElementById("position-wrapper").style.display = "none";
+  }
+});
 
     // ===== State =====
     let lastSentData = null;
