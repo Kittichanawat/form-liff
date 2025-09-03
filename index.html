@@ -1,276 +1,726 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ลงทะเบียนพนักงาน · Codelabs</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ลงทะเบียนพนักงาน · Codelabs</title>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
 
-  <!-- Icons / UI libs -->
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="global.css">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
+      crossorigin="anonymous"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-</head>
-<body>
-  <main class="page-shell">
-    <!-- Header / Brand -->
-    <header class="d-flex justify-content-between align-items-center mb-4">
-      <div class="brand-badge">
-        <i class="fa-solid fa-atom"></i>
-        <span>Codelabs</span>
-      </div>
-      <small class="text-muted">Secure Onboarding</small>
-    </header>
+    <style>
+      :root {
+        --brand-1: #6c5ce7; /* base */
+        --brand-2: #a66cff; /* accent */
+        --bg-1: #0f1221;
+        --card-bg: rgba(255, 255, 255, 0.85);
+        --text-1: #1d1e20;
+        --text-2: #60636b;
+        --ring: rgba(108, 92, 231, 0.35);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --card-bg: rgba(22, 24, 35, 0.75);
+          --text-1: #e8e8ea;
+          --text-2: #a8abb3;
+        }
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: 'Inter', 'Kanit', system-ui, -apple-system, Segoe UI,
+          Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+          "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        color: var(--text-1);
+        background: radial-gradient(
+            60rem 60rem at 85% -10%,
+            rgba(166, 108, 255, 0.25),
+            transparent 50%
+          ),
+          radial-gradient(
+            50rem 50rem at -10% 110%,
+            rgba(108, 92, 231, 0.25),
+            transparent 40%
+          ),
+          linear-gradient(
+            180deg,
+            #f7f6ff 0%,
+            #f2f5ff 25%,
+            #eef3ff 60%,
+            #f7f8ff 100%
+          );
+        background-attachment: fixed;
+      }
+      .brand-badge {
+        display: inline-flex;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        font-weight: 600;
+        background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+        color: #fff;
+        box-shadow: 0 6px 24px rgba(108, 92, 231, 0.35);
+      }
+      .page-shell {
+        max-width: 880px;
+        margin-inline: auto;
+        padding: clamp(18px, 3vw, 32px);
+      }
+      .glass-card {
+        background: var(--card-bg);
+        backdrop-filter: saturate(135%) blur(14px);
+        -webkit-backdrop-filter: saturate(135%) blur(14px);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 20px;
+        box-shadow: 0 12px 35px rgba(20, 16, 56, 0.12);
+      }
+      .card-pad {
+        padding: clamp(18px, 4vw, 32px);
+      }
+      .hero-title {
+        font-size: clamp(1.4rem, 2.5vw + 0.8rem, 2.2rem);
+        letter-spacing: 0.2px;
+      }
+      .hero-sub {
+        color: var(--text-2);
+      }
+      .form-section-title {
+        font-weight: 600;
+        margin-top: 0.25rem;
+      }
+      .input-icon {
+        position: absolute;
+        inset-inline-start: 0.9rem;
+        inset-block-start: 50%;
+        transform: translateY(-50%);
+        color: var(--brand-1);
+        opacity: 0.75;
+        pointer-events: none;
+        font-size: 0.95rem;
+      }
+      .field {
+        position: relative;
+      }
+      .form-control,
+      .form-select {
+        border-radius: 12px;
+        border: 1px solid #e6e8ef;
+        padding-block: 0.8rem;
+        padding-inline: 2.3rem 1rem;
+        font-size: 0.98rem;
+        background-clip: padding-box;
+      }
+      .form-select {
+        padding-inline-start: 2.2rem;
+      }
+      .form-control:focus,
+      .form-select:focus {
+        box-shadow: 0 0 0 0.25rem var(--ring);
+        border-color: #d8d3ff;
+      }
+      .btn-gradient {
+        --bs-btn-color: #fff;
+        --bs-btn-bg: transparent;
+        --bs-btn-border-color: transparent;
+        --bs-btn-hover-color: #fff;
+        --bs-btn-hover-bg: transparent;
+        --bs-btn-hover-border-color: transparent;
+        position: relative;
+        isolation: isolate;
+        border-radius: 12px;
+        padding: 0.875rem 1rem;
+        font-weight: 600;
+      }
+      .btn-gradient::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+        box-shadow: 0 8px 28px rgba(108, 92, 231, 0.35);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      .btn-gradient:hover::before {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 34px rgba(108, 92, 231, 0.45);
+      }
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--text-2);
+        font-size: 0.9rem;
+      }
+      .divider::before,
+      .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, #e8eaf5, transparent);
+      }
+      .divider::after {
+        background: linear-gradient(90deg, transparent, #e8eaf5);
+      }
+      /* OTP input look as boxes */
+      #inputOtp {
+        font-weight: 600;
+        letter-spacing: 0.48rem;
+        text-align: center;
+        font-size: 1.25rem;
+        padding-left: 1.2rem; /* to counter letter-spacing start */
+      }
+      /* Subtle scale-in */
+      @keyframes popIn {
+        from {
+          transform: translateY(8px);
+          opacity: 0;
+        }
+        to {
+          transform: none;
+          opacity: 1;
+        }
+      }
+      .animate-in {
+        animation: popIn 0.5s ease both;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="d-flex justify-content-between align-items-center mb-4">
+        <div class="brand-badge">
+          <i class="fa-solid fa-atom"></i>
+          <span>Codelabs</span>
+        </div>
+        <small class="text-muted">Secure Onboarding</small>
+      </header>
 
-    <!-- Content Card -->
-    <section class="glass-card card-pad animate-in">
-      <div class="mb-3">
-        <h1 class="hero-title mb-1"><i class="fa-solid fa-id-card me-2"></i>ฟอร์มลงทะเบียนพนักงาน</h1>
-        <p class="hero-sub">กรอกข้อมูลให้ครบถ้วนเพื่อยืนยันตัวตนผ่านเบอร์โทร (OTP)</p>
-      </div>
-
-      <form id="form" novalidate>
-        <input type="hidden" id="userId" />
-        <input type="hidden" id="displayName" />
-
-        <div class="row g-3">
-          <div class="col-12 col-md-6">
-            <label for="flname" class="form-label form-section-title">ชื่อนามสกุล</label>
-            <div class="field">
-              <i class="fa-solid fa-user input-icon"></i>
-              <input type="text" id="flname" class="form-control" placeholder="เช่น อนันต์ ใจดี" required />
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6">
-            <label for="nname" class="form-label form-section-title">ชื่อเล่น</label>
-            <div class="field">
-              <i class="fa-solid fa-user-tag input-icon"></i>
-              <input type="text" id="nname" class="form-control" placeholder="เช่น เบสท์" required />
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6">
-            <label for="dob" class="form-label form-section-title">วันเดือนปีเกิด</label>
-            <div class="field">
-              <i class="fa-solid fa-calendar-days input-icon"></i>
-              <input type="date" id="dob" class="form-control" required />
-            </div>
-          </div>
-
-        
-<!-- ช่องเลือกแผนก -->
-<div class="col-12 col-md-6">
-  <label for="department" class="form-label form-section-title">แผนก</label>
-  <div class="field">
-    <i class="fa-solid fa-building input-icon"></i>
-    <select id="department" class="form-select" required>
-      <option value="">-- กรุณาเลือกแผนก --</option>
-    </select>
-  </div>
-</div>
-
-<!-- ช่องเลือกตำแหน่ง (ซ่อนตอนแรก) -->
-<div class="col-12 col-md-6" id="position-wrapper" style="display:none;">
-  <label for="position" class="form-label form-section-title">ตำแหน่ง</label>
-  <div class="field">
-    <i class="fa-solid fa-briefcase input-icon"></i>
-    <select id="position" class="form-select" required>
-      <option value="">-- กรุณาเลือกตำแหน่ง --</option>
-    </select>
-  </div>
-</div>
-
-
-          <div class="col-12 col-md-6">
-            <label for="email" class="form-label form-section-title">อีเมล</label>
-            <div class="field">
-              <i class="fa-solid fa-envelope input-icon"></i>
-              <input type="email" id="email" class="form-control" placeholder="name@company.com" required />
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6">
-            <label for="phone" class="form-label form-section-title">เบอร์โทรศัพท์</label>
-            <div class="field">
-              <i class="fa-solid fa-phone input-icon"></i>
-              <input type="tel" id="phone" class="form-control" inputmode="numeric" pattern="[0-9]{10}" placeholder="ตัวอย่าง 0812345678" required />
-            </div>
-            <div class="form-text">กรอกเฉพาะตัวเลข 10 หลัก</div>
-          </div>
+      <section class="glass-card card-pad animate-in">
+        <div class="mb-3">
+          <h1 class="hero-title mb-1">
+            <i class="fa-solid fa-id-card me-2"></i>ฟอร์มลงทะเบียนพนักงาน
+          </h1>
+          <p class="hero-sub">
+            กรอกข้อมูลให้ครบถ้วนเพื่อยืนยันตัวตนผ่านเบอร์โทร (OTP)
+          </p>
         </div>
 
-        <div class="mt-4 d-grid">
-          <button type="submit" id="submitBtn" class="btn btn-gradient">
-            <i class="fa-solid fa-paper-plane me-2"></i>ส่งข้อมูล
-            <span class="spinner-border spinner-border-sm ms-2 d-none" id="submitSpinner" role="status" aria-hidden="true"></span>
-          </button>
-        </div>
+        <form id="form" novalidate>
+          <input type="hidden" id="userId" />
+          <input type="hidden" id="displayName" />
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label for="flname" class="form-label form-section-title"
+                >ชื่อนามสกุล</label
+              >
+              <div class="field">
+                <i class="fa-solid fa-user input-icon"></i>
+                <input
+                  type="text"
+                  id="flname"
+                  class="form-control"
+                  placeholder="เช่น อนันต์ ใจดี"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="nname" class="form-label form-section-title"
+                >ชื่อเล่น</label
+              >
+              <div class="field">
+                <i class="fa-solid fa-user-tag input-icon"></i>
+                <input
+                  type="text"
+                  id="nname"
+                  class="form-control"
+                  placeholder="เช่น เบสท์"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="dob" class="form-label form-section-title"
+                >วันเดือนปีเกิด</label
+              >
+              <div class="field">
+                <i class="fa-solid fa-calendar-days input-icon"></i>
+                <input type="date" id="dob" class="form-control" required />
+              </div>
+            </div>
 
-        <div class="mt-3 divider"><span><i class="fa-regular fa-circle-check me-1"></i>ข้อมูลของคุณถูกเก็บอย่างปลอดภัย</span></div>
-      </form>
-    </section>
-  </main>
+            <div class="col-12 col-md-6">
+              <label for="department" class="form-label form-section-title"
+                >แผนก</label
+              >
+              <div class="field">
+                <i class="fa-solid fa-building input-icon"></i>
+                <select id="department" class="form-select" required>
+                  <option value="">-- กรุณาเลือกแผนก --</option>
+                </select>
+              </div>
+            </div>
 
-  <!-- OTP Modal -->
-  <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 glass-card">
-        <div class="modal-header" style="background:linear-gradient(90deg, var(--brand-1), var(--brand-2)); color:#fff;">
-          <h5 class="modal-title" id="otpModalLabel"><i class="fa-solid fa-key me-2"></i>ยืนยัน OTP</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="ปิด"></button>
-        </div>
-        <div class="modal-body">
-          <p id="otp-info" class="mb-2">รหัสถูกส่งไปที่ <strong id="otp-phone"></strong></p>
-          <div class="mb-3">
-            <label for="inputOtp" class="form-label">กรอกรหัส OTP 6 หลัก</label>
-            <input type="text" class="form-control" id="inputOtp" maxlength="6" placeholder="X X X X X X" pattern="\d{6}">
-            <div class="form-text">ถ้าไม่ได้รับรหัส รอสักครู่แล้วกดส่งใหม่</div>
+            <div class="col-12 col-md-6" id="position-wrapper" style="display: none">
+              <label for="position" class="form-label form-section-title"
+                >ตำแหน่ง</label
+              >
+              <div class="field">
+                <i class="fa-solid fa-briefcase input-icon"></i>
+                <select id="position" class="form-select" required>
+                  <option value="">-- กรุณาเลือกตำแหน่ง --</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label for="email" class="form-label form-section-title"
+                >อีเมล</label
+              >
+              <div class="field">
+                <i class="fa-solid fa-envelope input-icon"></i>
+                <input
+                  type="email"
+                  id="email"
+                  class="form-control"
+                  placeholder="name@company.com"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="phone" class="form-label form-section-title"
+                >เบอร์โทรศัพท์</label
+              >
+              <div class="field">
+                <i class="fa-solid fa-phone input-icon"></i>
+                <input
+                  type="tel"
+                  id="phone"
+                  class="form-control"
+                  inputmode="numeric"
+                  pattern="[0-9]{10}"
+                  placeholder="ตัวอย่าง 0812345678"
+                  required
+                />
+              </div>
+              <div class="form-text">กรอกเฉพาะตัวเลข 10 หลัก</div>
+            </div>
           </div>
-          <div id="otp-error" class="text-danger small d-none">รหัสไม่ถูกต้องหรือหมดอายุ</div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" id="resendOtpBtn" class="btn btn-outline-secondary">
-            <i class="fa-solid fa-rotate me-1"></i>ส่งใหม่
-          </button>
-          <button type="button" id="verifyOtpBtn" class="btn btn-primary">
-            <i class="fa-solid fa-shield-halved me-1"></i>ยืนยัน
-          </button>
+
+          <div class="mt-4 d-grid">
+            <button type="submit" id="submitBtn" class="btn btn-gradient">
+              <i class="fa-solid fa-paper-plane me-2"></i>ส่งข้อมูล
+              <span
+                class="spinner-border spinner-border-sm ms-2 d-none"
+                id="submitSpinner"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </button>
+          </div>
+          <div class="mt-3 divider">
+            <span><i class="fa-regular fa-circle-check me-1"></i>ข้อมูลของคุณถูกเก็บอย่างปลอดภัย</span>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <div
+      class="modal fade"
+      id="otpModal"
+      tabindex="-1"
+      aria-labelledby="otpModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 glass-card">
+          <div
+            class="modal-header"
+            style="
+              background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+              color: #fff;
+            "
+          >
+            <h5 class="modal-title" id="otpModalLabel">
+              <i class="fa-solid fa-key me-2"></i>ยืนยัน OTP
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="ปิด"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p id="otp-info" class="mb-2">
+              รหัสถูกส่งไปที่ <strong id="otp-phone"></strong>
+            </p>
+            <div class="mb-3">
+              <label for="inputOtp" class="form-label">กรอกรหัส OTP 6 หลัก</label>
+              <input
+                type="text"
+                class="form-control"
+                id="inputOtp"
+                maxlength="6"
+                placeholder="X X X X X X"
+                pattern="\d{6}"
+              />
+              <div class="form-text">ถ้าไม่ได้รับรหัส รอสักครู่แล้วกดส่งใหม่</div>
+            </div>
+            <div id="otp-error" class="text-danger small d-none">
+              รหัสไม่ถูกต้องหรือหมดอายุ
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              id="resendOtpBtn"
+              class="btn btn-outline-secondary"
+            >
+              <i class="fa-solid fa-rotate me-1"></i>ส่งใหม่
+            </button>
+            <button type="button" id="verifyOtpBtn" class="btn btn-primary">
+              <i class="fa-solid fa-shield-halved me-1"></i>ยืนยัน
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    const API_BASE = "https://ceya6a6a4tqxef5wskbfjx4yr40cxrgo.lambda-url.ap-southeast-2.on.aws/ "; // 👉 เปลี่ยนเป็น API Gateway ของคุณ
-    let depMap = {};
-    let lastSentData = null;
-    let otpModalInstance = null;
-    let liffAccessToken = null;
+    <script>
+      // ===== Supabase Config =====
+      const SUPABASE_URL = "https://wdjntnboatkzuwyoikkr.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_7LcvdE3Q2NlnmJM_wb3qHA_ucbjPkKV";
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ===== Init LIFF =====
-    async function initLIFF() {
-      await liff.init({ liffId: "2007772610-2rjPV8NG" });
-      if (!liff.isLoggedIn()) liff.login();
-      const profile = await liff.getProfile();
-      document.getElementById("userId").value = profile.userId;
-      document.getElementById("displayName").value = profile.displayName;
-      liffAccessToken = liff.getAccessToken(); // เก็บไว้ใช้เรียก Lambda
-    }
+      let depMap = {}; // { dep_id: { name, positions: [] } }
 
-    // ===== Helper: API fetch พร้อมแนบ token =====
-    async function apiFetch(path, options = {}) {
-      const headers = options.headers || {};
-      headers["Authorization"] = `Bearer ${liffAccessToken}`;
-      headers["Content-Type"] = "application/json";
-      return fetch(`${API_BASE}${path}`, { ...options, headers });
-    }
-
-    // ===== โหลด department =====
-    async function loadDepartments() {
-      const res = await apiFetch("/departments");
-      const data = await res.json();
-      depMap = {};
-      data.forEach(item => {
-        const dep = item;
-        depMap[dep.dep_id] = dep;
-      });
-      const depSelect = document.getElementById("department");
-      depSelect.innerHTML = '<option value="">-- กรุณาเลือกแผนก --</option>';
-      Object.values(depMap).forEach(dep => {
-        const opt = document.createElement("option");
-        opt.value = dep.dep_id;
-        opt.textContent = dep.dep_name;
-        depSelect.appendChild(opt);
-      });
-    }
-
-    document.getElementById("department").addEventListener("change", e => {
-      const depId = e.target.value;
-      const posSelect = document.getElementById("position");
-      posSelect.innerHTML = '<option value="">-- กรุณาเลือกตำแหน่ง --</option>';
-      if (depId && depMap[depId]) {
-        depMap[depId].positions.forEach(pos => {
-          const opt = document.createElement("option");
-          opt.value = pos.p_id;
-          opt.textContent = pos.p_name;
-          posSelect.appendChild(opt);
+      // โหลดข้อมูลแผนก + ตำแหน่ง
+      async function loadDepartments() {
+        const { data, error } = await supabase
+          .from("dep_pos")
+          .select(
+            "dep_id, p_id, departments(dep_id, dep_name), position(p_id, p_name)"
+          );
+        if (error) {
+          console.error("Load departments error:", error);
+          return;
+        }
+        depMap = {};
+        data.forEach((item) => {
+          const dep = item.departments;
+          const pos = item.position;
+          if (!depMap[dep.dep_id]) {
+            depMap[dep.dep_id] = { name: dep.dep_name, positions: [] };
+          }
+          depMap[dep.dep_id].positions.push({ id: pos.p_id, name: pos.p_name });
         });
-        document.getElementById("position-wrapper").style.display = "block";
-      } else {
-        document.getElementById("position-wrapper").style.display = "none";
+
+        // เติม dropdown แผนก
+        const depSelect = document.getElementById("department");
+        depSelect.innerHTML = '<option value="">-- กรุณาเลือกแผนก --</option>';
+        Object.entries(depMap).forEach(([depId, dep]) => {
+          const opt = document.createElement("option");
+          opt.value = depId;
+          opt.textContent = dep.name;
+          depSelect.appendChild(opt);
+        });
       }
-    });
 
-    // ===== ฟอร์ม submit =====
-    document.getElementById("form").addEventListener("submit", async e => {
-      e.preventDefault();
-      const phone = document.getElementById("phone").value.trim();
-      if (!/^\d{10}$/.test(phone)) {
-        Swal.fire("เบอร์ไม่ถูกต้อง", "กรุณากรอกเบอร์โทรศัพท์ 10 หลัก", "warning");
-        return;
+      // เมื่อเลือกแผนก → เติม dropdown ตำแหน่ง
+      document.getElementById("department").addEventListener("change", (e) => {
+        const depId = e.target.value;
+        const posSelect = document.getElementById("position");
+        posSelect.innerHTML = '<option value="">-- กรุณาเลือกตำแหน่ง --</option>';
+        if (depId && depMap[depId]) {
+          depMap[depId].positions.forEach((pos) => {
+            const opt = document.createElement("option");
+            opt.value = pos.id;
+            opt.textContent = pos.name;
+            posSelect.appendChild(opt);
+          });
+          document.getElementById("position-wrapper").style.display = "block";
+        } else {
+          document.getElementById("position-wrapper").style.display = "none";
+        }
+      });
+
+      // เรียกใช้ loadDepartments() ตอน init
+      main().then(loadDepartments);
+
+      // ===== State =====
+      let lastSentData = null;
+      let otpModalInstance = null;
+
+      // ===== LIFF Init =====
+      async function main() {
+        try {
+          await liff.init({ liffId: "2007772610-2rjPV8NG" });
+        } catch (e) {
+          console.error("LIFF init failed", e);
+        }
+
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+
+        try {
+          const profile = await liff.getProfile();
+          document.getElementById("userId").value = profile.userId;
+          document.getElementById("displayName").value = profile.displayName;
+        } catch (e) {
+          console.error("Get profile failed", e);
+        }
       }
-      const data = {
-        userId: document.getElementById("userId").value,
-        name: document.getElementById("flname").value,
-        nickname: document.getElementById("nname").value,
-        dob: document.getElementById("dob").value,
-        position: document.getElementById("position").value,
-        email: document.getElementById("email").value,
-        phone: phone
-      };
-      lastSentData = data;
-      const res = await apiFetch("/send-otp", { method: "POST", body: JSON.stringify(data) });
-      const result = await res.json();
-      if (result.success) {
-        document.getElementById("otp-phone").textContent = phone;
-        document.getElementById("inputOtp").value = "";
-        document.getElementById("otp-error").classList.add("d-none");
-        otpModalInstance.show();
-      } else {
-        Swal.fire("ส่ง OTP ไม่ได้", result.message, "error");
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const otpModalEl = document.getElementById("otpModal");
+        otpModalInstance = new bootstrap.Modal(otpModalEl, {
+          backdrop: "static",
+          keyboard: false,
+        });
+        document.getElementById("verifyOtpBtn").addEventListener("click", verifyOtp);
+        document.getElementById("resendOtpBtn").addEventListener("click", resendOtp);
+
+        // UX: enter to verify OTP
+        document.getElementById("inputOtp").addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter") verifyOtp();
+        });
+      });
+
+      // ===== Form Submit =====
+      document.getElementById("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById("submitBtn");
+        const spinner = document.getElementById("submitSpinner");
+        const phone = document.getElementById("phone").value.trim();
+
+        if (!/^\d{10}$/.test(phone)) {
+          Swal.fire("เบอร์ไม่ถูกต้อง", "กรุณากรอกเบอร์โทรศัพท์ 10 หลัก", "warning");
+          return;
+        }
+
+        const data = {
+          userId: document.getElementById("userId").value,
+          name: document.getElementById("flname").value,
+          nickname: document.getElementById("nname").value,
+          dob: document.getElementById("dob").value,
+          position: document.getElementById("position").value,
+          email: document.getElementById("email").value,
+          phone: phone,
+        };
+        lastSentData = data;
+
+        try {
+          submitBtn.disabled = true;
+          spinner.classList.remove("d-none");
+          const res = await fetch("https://n8n-three.nn-dev.me/webhook/send-otp", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+          const result = await res.json();
+
+          if (!result.success) {
+            Swal.fire(
+              "ไม่สามารถส่ง OTP ได้",
+              result.message || "กรุณาลองใหม่อีกครั้ง",
+              "error"
+            );
+            return;
+          }
+
+          // แสดง modal ให้กรอก OTP
+          document.getElementById("otp-phone").textContent = phone;
+          document.getElementById("inputOtp").value = "";
+          document.getElementById("otp-error").classList.add("d-none");
+          otpModalInstance.show();
+        } catch (e) {
+          console.error(e);
+          Swal.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: e?.message ? e.message : String(e),
+          });
+        } finally {
+          submitBtn.disabled = false;
+          spinner.classList.add("d-none");
+        }
+      });
+
+      // ===== OTP Verify =====
+      async function verifyOtp() {
+        const phone = document.getElementById("phone").value.trim();
+        const userOtp = document.getElementById("inputOtp").value.trim();
+        const errorEl = document.getElementById("otp-error");
+
+        if (!/^\d{6}$/.test(userOtp)) {
+          errorEl.textContent = "กรุณากรอกรหัส 6 หลัก";
+          errorEl.classList.remove("d-none");
+          return;
+        }
+
+        try {
+          const verifyRes = await fetch(
+            "https://n8n-three.nn-dev.me/webhook/verify-otp",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ phone, otp: userOtp }),
+            }
+          );
+          const verifyResult = await verifyRes.json();
+
+          if (!verifyResult.verified) {
+            errorEl.textContent = "OTP ไม่ถูกต้องหรือหมดอายุ";
+            errorEl.classList.remove("d-none");
+            return;
+          }
+
+          // OTP ผ่านแล้ว — ไป insert แล้วแจ้งผลตามกรณี
+          if (lastSentData) {
+            const payload = { ...lastSentData, verified: true };
+            try {
+              const insertRes = await fetch(
+                "https://n8n-three.nn-dev.me/webhook/my-form",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(payload),
+                }
+              );
+              const insertResult = await insertRes.json();
+
+              // ปิด modal ก่อนแจ้งผล
+              otpModalInstance.hide();
+
+              if (insertResult.message === "duplicate") {
+                Swal.fire({
+                  icon: "info",
+                  title: "เคยลงทะเบียนแล้ว",
+                  text: "มีข้อมูลอยู่ในระบบแล้ว ไม่ต้องลงซ้ำ",
+                }).then(() => {
+                  if (window.liff && liff.closeWindow) liff.closeWindow();
+                });
+              } else if (insertResult.message === "success") {
+                Swal.fire({
+                  icon: "success",
+                  title: "ลงทะเบียนสำเร็จ",
+                  text: "ข้อมูลถูกบันทึกแล้ว",
+                }).then(() => {
+                  if (window.liff && liff.closeWindow) liff.closeWindow();
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "เกิดข้อผิดพลาด",
+                  text: "เกิดข้อผิดพลาดในการบันทึกข้อมูล",
+                });
+              }
+            } catch (err) {
+              console.error("Insert error:", err);
+              otpModalInstance.hide();
+              Swal.fire({
+                icon: "warning",
+                title: "ลงทะเบียนไม่สมบูรณ์",
+                text: "เกิดข้อผิดพลาดตอนบันทึกข้อมูล",
+              });
+            }
+          } else {
+            otpModalInstance.hide();
+            Swal.fire({
+              icon: "error",
+              title: "ไม่พบข้อมูล",
+              text: "ข้อมูลการลงทะเบียนหายไป กรุณากรอกใหม่",
+            });
+          }
+        } catch (err) {
+          console.error(err);
+          errorEl.textContent = "เกิดข้อผิดพลาดระหว่างตรวจสอบ OTP";
+          errorEl.classList.remove("d-none");
+        }
       }
-    });
 
-    // ===== Verify OTP =====
-    async function verifyOtp() {
-      const phone = document.getElementById("phone").value;
-      const otp = document.getElementById("inputOtp").value;
-      const res = await apiFetch("/verify-otp", { method: "POST", body: JSON.stringify({ phone, otp }) });
-      const result = await res.json();
-      if (!result.verified) {
-        document.getElementById("otp-error").textContent = "OTP ไม่ถูกต้องหรือหมดอายุ";
-        document.getElementById("otp-error").classList.remove("d-none");
-        return;
+      // ===== Resend OTP =====
+      async function resendOtp() {
+        if (!lastSentData) {
+          Swal.fire(
+            "ไม่สามารถส่งใหม่ได้",
+            "ข้อมูลเดิมไม่พบ กรุณากรอกฟอร์มใหม่",
+            "warning"
+          );
+          return;
+        }
+        try {
+          const res = await fetch("https://n8n-three.nn-dev.me/webhook/send-otp", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(lastSentData),
+          });
+          const result = await res.json();
+          if (!result.success) {
+            Swal.fire(
+              "ส่ง OTP ใหม่ล้มเหลว",
+              result.message || "ลองอีกครั้ง",
+              "error"
+            );
+            return;
+          }
+          Swal.fire({
+            icon: "success",
+            title: "ส่งใหม่แล้ว",
+            text: `รหัส OTP ถูกส่งไปที่ ${lastSentData.phone}`,
+          });
+          document.getElementById("inputOtp").value = "";
+          document.getElementById("otp-error").classList.add("d-none");
+        } catch (e) {
+          console.error(e);
+          Swal.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: e?.message ? e.message : String(e),
+          });
+        }
       }
-      await apiFetch("/save-form", { method: "POST", body: JSON.stringify(lastSentData) });
-      otpModalInstance.hide();
-      Swal.fire("สำเร็จ", "ข้อมูลถูกบันทึกแล้ว", "success");
-    }
 
-    // ===== Resend OTP =====
-    async function resendOtp() {
-      await apiFetch("/send-otp", { method: "POST", body: JSON.stringify(lastSentData) });
-      Swal.fire("ส่งใหม่แล้ว", `OTP ถูกส่งไปที่ ${lastSentData.phone}`, "success");
-    }
-
-    // ===== Init =====
-    document.addEventListener("DOMContentLoaded", () => {
-      otpModalInstance = new bootstrap.Modal(document.getElementById("otpModal"), { backdrop: "static", keyboard: false });
-      document.getElementById("verifyOtpBtn").addEventListener("click", verifyOtp);
-      document.getElementById("resendOtpBtn").addEventListener("click", resendOtp);
-      initLIFF().then(loadDepartments);
-    });
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-</body>
+      main();
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
