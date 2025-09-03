@@ -175,39 +175,42 @@
 
     // ===== โหลด department =====
     async function loadDepartments() {
-      const res = await apiFetch("/departments");
-      const data = await res.json();
-      depMap = {};
-      data.forEach(item => {
-        const dep = item;
-        depMap[dep.dep_id] = dep;
-      });
-      const depSelect = document.getElementById("department");
-      depSelect.innerHTML = '<option value="">-- กรุณาเลือกแผนก --</option>';
-      Object.values(depMap).forEach(dep => {
-        const opt = document.createElement("option");
-        opt.value = dep.dep_id;
-        opt.textContent = dep.dep_name;
-        depSelect.appendChild(opt);
-      });
-    }
+  const res = await apiFetch("/departments");
+  const data = await res.json();
+  depMap = {};
+  data.forEach(dep => {
+    depMap[dep.dep_id] = dep; // เก็บทั้ง dep_name และ positions
+  });
 
-    document.getElementById("department").addEventListener("change", e => {
-      const depId = e.target.value;
-      const posSelect = document.getElementById("position");
-      posSelect.innerHTML = '<option value="">-- กรุณาเลือกตำแหน่ง --</option>';
-      if (depId && depMap[depId]) {
-        depMap[depId].positions.forEach(pos => {
-          const opt = document.createElement("option");
-          opt.value = pos.p_id;
-          opt.textContent = pos.p_name;
-          posSelect.appendChild(opt);
-        });
-        document.getElementById("position-wrapper").style.display = "block";
-      } else {
-        document.getElementById("position-wrapper").style.display = "none";
-      }
+  const depSelect = document.getElementById("department");
+  depSelect.innerHTML = '<option value="">-- กรุณาเลือกแผนก --</option>';
+  Object.values(depMap).forEach(dep => {
+    const opt = document.createElement("option");
+    opt.value = dep.dep_id;
+    opt.textContent = dep.dep_name;
+    depSelect.appendChild(opt);
+  });
+}
+
+
+document.getElementById("department").addEventListener("change", e => {
+  const depId = e.target.value;
+  const posSelect = document.getElementById("position");
+  posSelect.innerHTML = '<option value="">-- กรุณาเลือกตำแหน่ง --</option>';
+
+  if (depId && depMap[depId]) {
+    depMap[depId].positions.forEach(pos => {
+      const opt = document.createElement("option");
+      opt.value = pos.p_id;
+      opt.textContent = pos.p_name;
+      posSelect.appendChild(opt);
     });
+    document.getElementById("position-wrapper").style.display = "block";
+  } else {
+    document.getElementById("position-wrapper").style.display = "none";
+  }
+});
+
 
     // ===== ฟอร์ม submit =====
     document.getElementById("form").addEventListener("submit", async e => {
